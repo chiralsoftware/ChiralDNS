@@ -1,0 +1,134 @@
+chiralDNS console commands
+
+The chiralDNS console allows an administrator to examine the contents
+of the chiralDNS database.  Information in the database is structured
+as Zones and Records.
+
+The DNS hierarchy is a tree, starting at root, represented by a ".".
+For example, in www.yahoo.com, . is the root, com is the second level,
+yahoo is the third and www is the fourth.  www.yahoo.com is a Zone.
+yahoo.com is a Zone, and com is a Zone.  Therefore www.yahoo.com
+contains four other Zones, and it could be contained by other zones,
+such as server1.www.yahoo.com.  Note that Zones are unique; in other
+words, both www.yahoo.com and www.yahoo.com cannot exist at the same
+time.
+
+A Record contains DNS information, of a certain Type, about a Zone.
+The DNS specification defines many different Record Types, but only a
+few of them are in use, and only these are supported by chiralDNS.
+These Types are:
+
+   A: Address.
+
+   CNAME: Canonical name.
+
+   HINFO: Host info.
+
+   MX: Mail exchanger.
+
+   NS: Name server.
+
+   PTR: Pointer.
+
+   SOA: Start of Authority.
+
+   TXT: Text record.
+
+See "DNS and BIND" by Paul Albitz and Cricket Liu (ISBN 0-596-00170-3)
+for more information about these types.
+
+A given Zone may have several records of the same type, but these
+records must be unique.  In other words, www.yahoo.com can contain A
+records for 66.218.71.89 and 66.218.71.80, but it cannot contain two A
+records for 66.218.71.89.
+
+In the resolution process, the client sends a request for a certain
+Zone with a certain type.  The Resolver goes through this process:
+
+   If the exact Zone can be found, and Record(s) of the type can be
+   found, return them and we are done.
+
+   If the Zone cannot be found, back up to the previous Zone, until we
+   find either a SOA record, in which case return that, or we find a *
+   Record of the appropriate Type, in which case return that.
+
+Commands:
+
+The first set of commands are available from the main prompt.
+
+   help
+
+   Display the help file.
+
+   zone [zone name]
+
+   Enter the Zone.  At this point, the prompt changes to be the Zone
+   name, and Zone commands are enabled.
+
+   del [zone name]
+
+   Delete the Zone, and all of its sub-zones, and all the records they
+   contain.
+
+   add [zone name]
+
+   Create a new Zone with the given name.  This creates all the
+   intermediary Zones, too, if necessary.
+
+   lz [zone name]
+
+   List all the direct sub-zones of this Zone.
+
+   lr [zone name]
+
+   List all the Records attached to this Zone.
+
+   find [string]
+
+   Find all the Zones that contain this string.
+
+   stats
+
+   Display some statistic about the database: How many zones are
+   served, how many records, etc.
+
+   quit
+
+   Exit the command console.
+
+The Zone sub-menu commands:
+
+Once a Zone has been entered, the prompt changes and the command set
+changes.
+
+   lr
+
+   List all the Records in this Zone.
+
+   lz
+
+   List all the sub-zones.
+
+   del [record type]
+
+   Delete all records of the specified type
+
+   add [record type] [record fields]
+
+   Create a new Record of the specified type, with the given fields.
+
+   del [name]
+
+   Delete a subzone, and all its records and subzones.
+
+   zone [zone name]
+
+   Switch to another Zone.
+
+   back
+
+   Go back to the main command interface.
+
+   help
+
+   Display the help file.

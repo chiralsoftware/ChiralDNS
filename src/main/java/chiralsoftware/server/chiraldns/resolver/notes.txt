@@ -1,0 +1,62 @@
+Notes on identifying the appropriate authorities for a name
+
+Zone data:
+
+com soa ....
+com ns .....
+mobile.com a 48.44.44.44
+mail.mobile.com a 48.55.55.55
+*.foo.com a 77.77.77.77
+megacorp.com ns ns1.megacorp.com
+ns1.megacorp.com a 38.22.22.22
+
+"mobile.com": fully resolved.  Should return: .com NS records.  Does
+mobile.com exist?  Yes.  Is there a NS record in the mobile.com zone
+(this would be a cut)?  No.  Is there an NS record for com?  Yes,
+return it.
+
+
+"mail.mobile.com": fully resolved.  Should get the .com ns records.  Is
+there a ns record in the mail.mobile.com zone?  No.  Is there an ns
+record in the mobile.com zone?  No.  Is there an ns record in the .com
+zone?  Yes.  Return it.
+
+
+"bob.jones.foo.com": not fully resolved, but "foo.com" is a star record.
+It should return the .com ns records.  Does bob.jones.foo.com exist?
+No.  Does jones.foo.com exist?  No.  Does foo.com exist and is it a star
+record?  Yes.  Does foo.com have an ns record?  No.  Does com have an ns
+record?  Yes, return it.
+
+
+"wrong.com": not fully resolved, "com" is not a star record.  It should
+return the .com soa record.  Does wrong.com exist?  No.  Does com exist
+and is it a star zone?  No.  Return the SOA record.
+
+
+"foo.com": is not fully resolved, no star record.  It should return
+the root NS records.  Does foo.com exist?  No.  Does .com exist?  No.
+We are at root.  Return root NS records.
+
+
+"mailserver.megacorp.com": not fully resolved, no star record.  It
+should return ns1.megacorp.com.  Does mailserver.megacorp.com exist?
+No.  Does megacorp.com exist?  Yes.  Return its NS record.
+
+"ns1.megacorp.com": Fully resolved. It should return ns1.megacorp.com as
+the ns.  Does ns1.megacorp.com exist?  Yes.  Does it have an NS record?
+No.  Does megacorp.com have an NS record?  Yes.  Return it.
+
+"wrong.bad.com": Not fully resolved, no star record. It should return
+.com SOA.  Does wrong.bad.com exist?  No.  Does bad.com exist?  No.
+Return com's soa.
+
+
+Alg:
+
+If name is not fully resolved and non-star, go up the zones.  For each
+zone, check for NS or SOA.  If SOA is found, we have an AA NXDOMAIN.
+If NS is found, return it.
+
+If it is fully-resolved (or has a star) it CAN'T be an NXDOM and so it
+must have an NS record.  Keep going up the zones til an ns is found.

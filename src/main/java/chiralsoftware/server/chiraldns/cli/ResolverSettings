@@ -1,0 +1,6 @@
+# settings file for resolver properties.
+# these must be defined
+driverClass=org.postgresql.Driver
+connectionString=jdbc:postgresql:domain
+userName=hh
+userPassword=
